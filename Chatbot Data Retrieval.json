@@ -1,0 +1,224 @@
+{
+  "name": "Chatbot Data Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "query"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "906e637c-adf9-478e-ad67-ae9c39265b17",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "mode": "load",
+        "pineconeIndex": {
+          "__rl": true,
+          "value": "hr",
+          "mode": "list",
+          "cachedResultName": "hr"
+        },
+        "prompt": "={{ $json.query }}",
+        "topK": 5,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStorePinecone",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "a144b40f-445f-4f06-b674-e1427b30238b",
+      "name": "Pinecone Vector Store",
+      "credentials": {
+        "pineconeApi": {
+          "id": "erOPm3NKo2rKU6Tz",
+          "name": "PineconeApi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        304,
+        224
+      ],
+      "id": "70ad0e30-7f1e-4cda-bdb1-dca216613c70",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "vNmskKGglnHxyvvc",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc0094e8-62d0-48da-90f5-f0a3787a11df",
+              "name": "Content",
+              "value": "={{ $json.document.pageContent }}",
+              "type": "string"
+            },
+            {
+              "id": "ee75a0a8-9d12-4657-8615-f713f2911479",
+              "name": "Filename",
+              "value": "={{ $json.document.metadata['Document ID'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9a15b539-c24b-40be-859a-f2931a7d0abc",
+              "name": "URL",
+              "value": "={{ $json.document.metadata['Document URL'] }}",
+              "type": "string"
+            },
+            {
+              "id": "bbc279a6-cd01-4920-877c-d1c042b266f2",
+              "name": "Page",
+              "value": "={{ $json.document.metadata['loc.pageNumber'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        576,
+        0
+      ],
+      "id": "b042f8a8-9d36-41b6-9d8a-0f89c9d546bc",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        784,
+        16
+      ],
+      "id": "9785a909-0a41-4fa1-8935-dfc64aca0328",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4dedc918-439b-4f17-94b0-6d4c419cd03d",
+              "name": "Response",
+              "value": "={{$json.toJsonString()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        16
+      ],
+      "id": "a8a72f17-830f-4626-be73-51f212916ad0",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "query": "sick days"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Pinecone Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pinecone Vector Store": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "50e49ea3-b5b0-4ad7-bf36-6fb76c48faf0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0bc77d1e83eb271c93d761935713d306621ca9e7f4a7a40c1c9c6764db49cd61"
+  },
+  "id": "0yOhd0m1brnFKzCL",
+  "tags": []
+}
