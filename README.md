@@ -3,7 +3,7 @@
 The HR Chatbot is a smart virtual assistant designed to simplify and automate common HR-related tasks within an organization.  
 It helps employees get quick answers to their HR queries, apply for leave, check attendance, and know about company policies — all through a friendly chat interface.
 
----
+-----
 
 ## 🧩 How It’s Built
 
