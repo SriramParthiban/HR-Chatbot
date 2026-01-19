@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
+      "type": "n8n-nodes-base.manualTriggers",
       "typeVersion": 1,
       "position": [
         0,
